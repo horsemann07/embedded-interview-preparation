@@ -5,6 +5,23 @@
 
 ---
 
+## SUMMARY TABLE
+
+| Topic | Basic | Intermediate | Advanced | Expert |
+|-------|-------|-------------|----------|--------|
+| RTOS fundamentals | ★★★★★ | ★★★★★ | ★★★☆☆ | ★★☆☆☆ |
+| Task & scheduling | ★★★★★ | ★★★★★ | ★★★★★ | ★★★★★ |
+| Synchronization | ★★★★☆ | ★★★★★ | ★★★★☆ | ★★★★☆ |
+| IPC | ★★★★☆ | ★★★★★ | ★★★★☆ | ★★★☆☆ |
+| Memory management | ★★★☆☆ | ★★★★★ | ★★★★★ | ★★★★★ |
+| Multicore | ★★☆☆☆ | ★★★☆☆ | ★★★★★ | ★★★★★ |
+| Safety/Certification | ★★☆☆☆ | ★★★☆☆ | ★★★★★ | ★★★★★ |
+| Schedulability theory | ★★☆☆☆ | ★★★☆☆ | ★★★★☆ | ★★★★★ |
+| Formal verification | ★☆☆☆☆ | ★★☆☆☆ | ★★★☆☆ | ★★★★★ |
+| Real-time comms | ★★☆☆☆ | ★★★☆☆ | ★★★★☆ | ★★★★★ |
+
+---
+
 ## BASIC LEVEL
 
 ### Definition & Fundamentals
@@ -453,22 +470,5 @@
 18. What is the role of RTOS in autonomous vehicles (AUTOSAR Adaptive)?
     - Follow-up: POSIX PSE51 profile.
     - Follow-up: Service-oriented architecture on RTOS.
-
----
-
-## SUMMARY TABLE
-
-| Topic | Basic | Intermediate | Advanced | Expert |
-|-------|-------|-------------|----------|--------|
-| RTOS fundamentals | ★★★★★ | ★★★★★ | ★★★☆☆ | ★★☆☆☆ |
-| Task & scheduling | ★★★★★ | ★★★★★ | ★★★★★ | ★★★★★ |
-| Synchronization | ★★★★☆ | ★★★★★ | ★★★★☆ | ★★★★☆ |
-| IPC | ★★★★☆ | ★★★★★ | ★★★★☆ | ★★★☆☆ |
-| Memory management | ★★★☆☆ | ★★★★★ | ★★★★★ | ★★★★★ |
-| Multicore | ★★☆☆☆ | ★★★☆☆ | ★★★★★ | ★★★★★ |
-| Safety/Certification | ★★☆☆☆ | ★★★☆☆ | ★★★★★ | ★★★★★ |
-| Schedulability theory | ★★☆☆☆ | ★★★☆☆ | ★★★★☆ | ★★★★★ |
-| Formal verification | ★☆☆☆☆ | ★★☆☆☆ | ★★★☆☆ | ★★★★★ |
-| Real-time comms | ★★☆☆☆ | ★★★☆☆ | ★★★★☆ | ★★★★★ |
 
 ---
