@@ -11,7 +11,7 @@
 
 ## Definition & Fundamentals
 
-#### 1. What is an RTOS?
+### 1. What is an RTOS?
 
 **Answer**
 
@@ -148,7 +148,7 @@ Other systems and real-time frameworks are also widely used depending on the ind
 
 ---
 
-#### 2. Hard real-time vs Soft real-time vs Firm real-time
+### 2. Hard real-time vs Soft real-time vs Firm real-time
 
 **Answer**
 
@@ -276,7 +276,7 @@ not raw execution speed.
 
 ---
 
-#### 3. RTOS vs GPOS (General Purpose Operating System)
+### 3. RTOS vs GPOS (General Purpose Operating System)
 
 **Answer**
 
@@ -379,7 +379,7 @@ but also need tighter latency than ordinary Linux provides.
 
 ---
 
-#### 4. What is determinism in RTOS?
+### 4. What is determinism in RTOS?
 
 **Answer**
 
@@ -545,7 +545,7 @@ This is why WCET is only one part of response-time analysis.
 
 ---
 
-#### 5. What is jitter?
+### 5. What is jitter?
 
 **Answer**
 
@@ -684,7 +684,7 @@ Real-time behavior is terrible for a task that needs a bounded response.
 
 ---
 
-#### 6. What are the main components of an RTOS?
+### 6. What are the main components of an RTOS?
 
 **Answer**
 
@@ -832,7 +832,7 @@ A perfect scheduler cannot save a system that has a 5 ms interrupt-disabled crit
 
 ---
 
-#### 7. What is a tick in RTOS?
+### 7. What is a tick in RTOS?
 
 **Answer**
 
@@ -985,7 +985,7 @@ without simply increasing the RTOS tick rate.
 
 # TASKS
 
-#### 8. What is a task in RTOS?
+### 8. What is a task in RTOS?
 
 **Answer**
 
@@ -1095,7 +1095,7 @@ Debug information
 
 ---
 
-#### 9. What are task states? Draw and explain the state machine.
+### 9. What are task states? Draw and explain the state machine.
 
 **Answer**
 
@@ -1248,7 +1248,7 @@ However, the exact state model depends on the RTOS.
 
 ---
 
-#### 10. What is task priority?
+### 10. What is task priority?
 
 **Answer**
 
@@ -1355,7 +1355,7 @@ In hard real-time systems, arbitrary priority boosting should be used carefully 
 
 ---
 
-#### 11. What is task stack?
+### 11. What is task stack?
 
 **Answer**
 
@@ -1517,7 +1517,7 @@ Static analysis
 
 # CONTEXT SWITCHING
 
-#### 12. What is context switching?
+### 12. What is context switching?
 
 **Answer**
 
@@ -1638,7 +1638,7 @@ This helps keep higher-priority interrupts responsive.
 
 ---
 
-#### 13. What triggers a context switch?
+### 13. What triggers a context switch?
 
 **Answer**
 
@@ -1754,7 +1754,7 @@ depending on the architecture and RTOS.
 
 ---
 
-#### 14. Preemptive vs Cooperative scheduling?
+### 14. Preemptive vs Cooperative scheduling?
 
 **Answer**
 
