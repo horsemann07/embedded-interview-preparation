@@ -1,646 +1,705 @@
 
+## Table of Contents
 
-```
-RTOS — From First Principles to Expert Level
-│
-├── 01. Introduction to RTOS
-│   ├── What is an RTOS?
-│   ├── Why do we need an RTOS?
-│   ├── Bare-metal vs RTOS
-│   ├── General Purpose OS vs RTOS
-│   ├── Hard, Firm and Soft Real-Time
-│   ├── Determinism
-│   ├── Deadline, Latency and Jitter
-│   ├── Real-world RTOS examples
-│   ├── RTOS architecture
-│   └── RTOS mental model
-│
-├── 02. RTOS Kernel Fundamentals
-│   ├── What is a Kernel?
-│   ├── Kernel responsibilities
-│   ├── Kernel objects
-│   ├── System calls
-│   ├── Kernel mode vs application mode
-│   ├── Tick interrupt
-│   ├── Tickless operation
-│   └── Kernel initialization
-│
-├── 03. Tasks / Threads
-│   ├── What is a task?
-│   ├── Task lifecycle
-│   ├── Task states
-│   ├── TCB
-│   ├── Task stack
-│   ├── Context
-│   ├── Context switching
-│   ├── Task creation/deletion
-│   ├── Stack overflow
-│   └── Task design principles
-│
-├── 04. Scheduling
-│   ├── Scheduler
-│   ├── Preemptive scheduling
-│   ├── Cooperative scheduling
-│   ├── Priority-based scheduling
-│   ├── Round robin
-│   ├── Time slicing
-│   ├── Priority inversion
-│   ├── Priority inheritance
-│   ├── Priority ceiling
-│   └── Scheduling analysis
-│
-├── 05. Interrupts and RTOS
-│   ├── What is an interrupt?
-│   ├── ISR
-│   ├── ISR vs task
-│   ├── Interrupt latency
-│   ├── Deferred interrupt processing
-│   ├── ISR-safe APIs
-│   ├── Nested interrupts
-│   ├── Interrupt priorities
-│   └── ISR-to-task communication
-│
-├── 06. Inter-Task Communication
-│   ├── Why tasks need communication
-│   ├── Queues
-│   ├── Mailboxes
-│   ├── Message buffers
-│   ├── Stream buffers
-│   ├── Event groups
-│   ├── Notifications
-│   └── Choosing the right mechanism
-│
-├── 07. Synchronization
-│   ├── Race conditions
-│   ├── Critical sections
-│   ├── Mutex
-│   ├── Binary semaphore
-│   ├── Counting semaphore
-│   ├── Recursive mutex
-│   ├── Spinlocks
-│   └── Synchronization patterns
-│
-├── 08. Memory Management
-│   ├── Stack vs heap
-│   ├── Static allocation
-│   ├── Dynamic allocation
-│   ├── Memory fragmentation
-│   ├── Memory pools
-│   ├── MPU
-│   ├── Memory protection
-│   └── Zero-copy concepts
-│
-├── 09. Time Management
-│   ├── System tick
-│   ├── Delays
-│   ├── Periodic tasks
-│   ├── Software timers
-│   ├── Absolute vs relative timing
-│   ├── Deadline management
-│   ├── Jitter
-│   └── Time drift
-│
-├── 10. RTOS Internals
-│   ├── Scheduler internals
-│   ├── Ready lists
-│   ├── Blocked lists
-│   ├── TCB internals
-│   ├── Context switch internals
-│   ├── PendSV
-│   ├── SVC
-│   ├── SysTick
-│   └── Critical section implementation
-│
-├── 11. ARM Cortex-M + RTOS
-│   ├── Exception model
-│   ├── NVIC
-│   ├── MSP vs PSP
-│   ├── Handler vs Thread mode
-│   ├── CONTROL register
-│   ├── SVC
-│   ├── PendSV
-│   ├── SysTick
-│   └── Context switching on Cortex-M
-│
-├── 12. RTOS Synchronization Problems
-│   ├── Race condition
-│   ├── Deadlock
-│   ├── Livelock
-│   ├── Starvation
-│   ├── Priority inversion
-│   ├── Priority inheritance
-│   └── Avoiding concurrency bugs
-│
-├── 13. Advanced Scheduling
-│   ├── Rate Monotonic Scheduling
-│   ├── Earliest Deadline First
-│   ├── Response-time analysis
-│   ├── WCET
-│   ├── CPU utilization
-│   └── Schedulability
-│
-├── 14. Multi-Core RTOS
-│   ├── SMP
-│   ├── AMP
-│   ├── Core affinity
-│   ├── Inter-core communication
-│   ├── Cache coherency
-│   ├── Spinlocks
-│   └── Multi-core
-```
+| # | Topic |
+|---|-------|
+| 1.1 | [What is an RTOS?](#11-what-is-an-rtos) |
+| 1.1.1 | [Understanding the Name](#111-understanding-the-name) |
+| 1.1.2 | [The Meaning of "Real-Time"](#112-the-meaning-of-real-time) |
+| 1.1.3 | [A Simple Example](#113-a-simple-example) |
+| 1.1.4 | [How the Same Product Grows](#114-how-the-same-product-grows) |
+| 1.1.5 | [A Timing Problem](#115-a-timing-problem) |
+| 1.1.6 | [The Basic Idea Behind an RTOS](#116-the-basic-idea-behind-an-rtos) |
+| 1.1.7 | [The RTOS as a Traffic Controller](#117-the-rtos-as-a-traffic-controller) |
+| 1.1.8 | [What an RTOS Provides](#118-what-an-rtos-provides) |
+| 1.1.9 | [RTOS and Predictability](#119-rtos-and-predictability) |
+| 1.1.10 | [RTOS Does Not Mean "Everything Runs at Once"](#1110-rtos-does-not-mean-everything-runs-at-once) |
+| 1.1.11 | [RTOS in an Embedded Product](#1111-rtos-in-an-embedded-product) |
+| 1.1.12 | [The Important Difference Between "OS" and "RTOS"](#1112-the-important-difference-between-os-and-rtos) |
+| 1.1.13 | [Why an RTOS Is Different From a Large While Loop](#1113-why-an-rtos-is-different-from-a-large-while-loop) |
+| 1.1.14 | [RTOS as a Layer of Abstraction](#1114-rtos-as-a-layer-of-abstraction) |
+| 1.1.15 | [A Complete Simple Picture](#1115-a-complete-simple-picture) |
+| 1.1.16 | [A Simple Mental Model](#1116-a-simple-mental-model) |
+| 1.1.17 | [Core Idea](#1117-core-idea) |
+| 1.1.18 | [Summary](#1118-summary) |
 
-# RTOS — From Fundamentals to Advanced Embedded Systems
+# 1.1 What is an RTOS?
 
-## Chapter 1 — Introduction to RTOS
+An **RTOS**, or **Real-Time Operating System**, is software designed to manage the execution of different pieces of an embedded application while giving special importance to **timing and predictable behavior**.
+
+In a simple embedded system, the software may have only one small responsibility. It may read a temperature sensor, compare the temperature with a limit, and turn a fan ON or OFF.
+
+As the product becomes larger, the software may need to perform many activities at the same time:
+
+* Read sensors
+* Control motors
+* Receive UART messages
+* Communicate over Bluetooth or Wi-Fi
+* Monitor buttons
+* Detect faults
+* Run diagnostics
+* Store logs
+* Handle communication timeouts
+* Perform periodic operations
+
+An RTOS provides a structured way to organize these activities so that the processor can execute them according to their requirements.
+
+The word **Real-Time** is important because the system is not concerned only with producing the correct result. The result may also need to be produced within a required amount of time.
 
 ---
 
-## 1.1 Introduction
+## 1.1.1 Understanding the Name
 
-An embedded system is usually built to perform a specific job. A simple system may read a sensor, process the value, and control an output. As the product becomes more complex, the software may need to handle communication, user input, motor control, diagnostics, logging, timers, networking, and several other activities at the same time.
-
-A very small embedded system can often handle these operations using a simple `while(1)` loop. As the number of activities increases, however, the software becomes harder to organize and harder to reason about.
-
-#### Example: From a Simple Loop to a Complex Embedded System
-
-Imagine a small temperature-monitoring device.
-
-At first, the system has only one job:
-
-1. Read the temperature sensor.
-2. Check whether the temperature is too high.
-3. Turn ON a fan if required.
-
-A simple implementation might look like this:
-
-```c
-while (1)
-{
-    temperature = read_temperature();
-
-    if (temperature > 40)
-    {
-        fan_on();
-    }
-    else
-    {
-        fan_off();
-    }
-}
-
-This works well because the system has very few responsibilities.
-
-Now imagine the product becomes more advanced. The same system must also:
-
-Read temperature and humidity sensors
-Control a fan and motor
-Receive commands through UART
-Send data over Bluetooth
-Monitor buttons
-Detect faults
-Store error logs
-Run periodic diagnostics
-Handle communication timeouts
-
-The main loop could start looking like this:
-
-This is where a **Real-Time Operating System**, commonly called an **RTOS**, becomes useful.
-
-An RTOS provides a structured environment for managing multiple activities while controlling:
-
-* when software executes,
-* how the CPU is shared,
-* how tasks communicate,
-* how tasks synchronize,
-* how software responds to interrupts,
-* and how timing requirements are handled.
-
-The important point is that an RTOS is not simply a smaller version of Windows or Linux.
-
-The primary concern of an RTOS is **controlled and predictable execution**.
-
----
-
-# 1.2 Understanding the Term RTOS
-
-The name can be divided into three parts:
+The term **RTOS** can be understood as:
 
 ```text
 Real + Time + Operating System
 ```
 
-The term **Operating System** refers to software that manages system resources and provides services to application software.
+Each word represents an important idea.
 
-The term **Real-Time** means that the timing of an operation is part of the system's correctness.
+### Operating System
 
-Consider a temperature monitoring system.
+An Operating System is software that manages system resources and provides common services to application software.
 
-Suppose the system detects an over-temperature condition and correctly calculates that the temperature is too high. If the system takes several seconds to react, the calculation may be correct, but the system has still failed its purpose.
-
-The result must therefore be both:
+In an embedded system, the resources may include:
 
 ```text
-Correct result
+CPU
+RAM
+Flash
+Timers
+Interrupts
+Communication peripherals
+Other hardware resources
+```
+
+Instead of every application component manually controlling all of these resources, an operating system can provide a structured software layer to manage them.
+
+A simplified view is:
+
+```text
++--------------------------------------+
+|             Application              |
+|                                      |
+| Sensor   Communication   Motor       |
+| Task     Processing      Control     |
++------------------+-------------------+
+                   |
+                   v
++--------------------------------------+
+|                 RTOS                 |
+|                                      |
+| Task Management                      |
+| Scheduling                            |
+| Timing                               |
+| Communication                        |
+| Synchronization                      |
++------------------+-------------------+
+                   |
+                   v
++--------------------------------------+
+|              Hardware               |
+|                                      |
+| CPU | RAM | Timer | UART | SPI | I2C |
++--------------------------------------+
+```
+
+The RTOS sits between the application and the hardware and provides services that make it easier to structure the software.
+
+---
+
+## 1.1.2 The Meaning of "Real-Time"
+
+The word **real-time** does not mean that the software must always run extremely fast.
+
+Instead, it means that the system has timing requirements that are part of the system's behavior.
+
+Consider a simple temperature-control system.
+
+The system performs:
+
+```text
+Read temperature
+        |
+        v
+Process temperature
+        |
+        v
+Decide whether cooling is required
+        |
+        v
+Control fan
+```
+
+Suppose the system correctly detects that the temperature is too high.
+
+The calculation is correct.
+
+But imagine that the software reacts several seconds later when the fan should have started immediately.
+
+The calculation was correct, but the system behavior was not acceptable.
+
+Therefore, real-time behavior can be understood as:
+
+```text
+Correct Result
       +
-Correct timing
-      =
-Correct real-time behavior
+Correct Timing
+      |
+      v
+Correct Real-Time Behavior
 ```
 
-This idea is fundamental to real-time systems.
+This is one of the most important ideas in RTOS development.
 
 ---
 
-# 1.3 Real-Time Does Not Mean Fast
+## 1.1.3 A Simple Example
 
-A common misunderstanding is that an RTOS is simply an operating system that makes software execute faster.
+Imagine a small embedded temperature controller.
 
-That is not the correct mental model.
+At the beginning, the product has only one responsibility:
 
-Consider two systems.
+1. Read the temperature.
+2. Compare it with a limit.
+3. Turn the fan ON or OFF.
 
-### System A
-
-```text
-Execution time:
-
-10 ms
-11 ms
-10 ms
-50 ms
-12 ms
-```
-
-### System B
-
-```text
-Execution time:
-
-15 ms
-15 ms
-16 ms
-15 ms
-16 ms
-```
-
-System A may sometimes finish earlier than System B, but its execution time has a large variation.
-
-System B is slower in some cases, but its behavior is much more predictable.
-
-For a real-time system, this predictability can be more important than average execution speed.
-
-A useful mental model is:
-
-```text
-General application:
-       "How fast can I finish?"
-
-Real-time system:
-       "Can I finish within the required time,
-        including the worst-case condition?"
-```
-
----
-
-# 1.4 Time as Part of Correctness
-
-In normal software, the following may be considered a correct result:
-
-```text
-10 + 20 = 30
-```
-
-In a real-time control system, correctness may look more like:
-
-```text
-Sensor event
-     ↓
-Processing
-     ↓
-Control decision
-     ↓
-Actuator command
-```
-
-The control decision might be correct only when it is produced within a specified deadline.
-
-For example:
-
-```text
-Event occurs
-│
-├─────────────────────── Deadline
-│                           │
-│                           ↓
-↓                           ✕
-Start                       Too late
-```
-
-If the result arrives after the deadline, the software may no longer be useful even though the computation itself was correct.
-
-Therefore:
-
-> In a real-time system, **when the result is produced** can be as important as **what the result contains**.
-
----
-
-# 1.5 A Simple Embedded System Without an RTOS
-
-Consider a small embedded device containing:
-
-* a temperature sensor,
-* a button,
-* a motor,
-* UART communication,
-* and a display.
-
-A simple bare-metal implementation could look like this:
+The application can be very simple:
 
 ```c
 int main(void)
 {
-    hardware_init();
-
     while (1)
     {
-        read_temperature();
-        check_button();
-        control_motor();
-        process_uart();
-        update_display();
+        int temperature = read_temperature();
+
+        if (temperature > 40)
+        {
+            fan_on();
+        }
+        else
+        {
+            fan_off();
+        }
     }
 }
 ```
 
-At first, this design is easy to understand.
-
-The CPU continuously executes the same sequence:
+The software continuously performs the same sequence:
 
 ```text
-                +----------------------+
-                |      Main Loop       |
-                +----------+-----------+
-                           |
-             +-------------+-------------+
-             |             |             |
-             ↓             ↓             ↓
-      Read Temperature  Check Button  Motor Control
-             |
-             ↓
-        UART Processing
-             |
-             ↓
-        Update Display
-             |
-             +----------------------+
-                      Repeat
+       +----------------------+
+       |   Read Temperature   |
+       +----------+-----------+
+                  |
+                  v
+       +----------------------+
+       | Compare with Limit   |
+       +----------+-----------+
+                  |
+             +----+----+
+             |         |
+             v         v
+         Temperature  Temperature
+           > 40         <= 40
+             |             |
+             v             v
+          Fan ON         Fan OFF
+             |             |
+             +------+------+
+                    |
+                    v
+                  Repeat
 ```
 
-For a small system this can be completely appropriate.
+For a small system, this can be perfectly reasonable.
 
-The difficulty appears when the software grows.
+There is very little software complexity, and the execution flow is easy to understand.
 
 ---
 
-# 1.6 The Problem With a Large Main Loop
+## 1.1.4 How the Same Product Grows
 
-Suppose the execution time of each operation is approximately:
+Now imagine that the product becomes more advanced.
 
-```text
-Temperature reading    →  2 ms
-Button processing      →  1 ms
-Motor control          →  1 ms
-UART processing        →  2 ms
-Display update          → 20 ms
-```
-
-The loop can take roughly:
+The same controller now needs to:
 
 ```text
-2 + 1 + 1 + 2 + 20 = 26 ms
+Read temperature
+Read humidity
+Control fan
+Control motor
+Receive UART commands
+Communicate using Bluetooth
+Monitor buttons
+Detect faults
+Store error logs
+Run diagnostics
+Handle communication timeouts
 ```
 
-Now imagine a button event occurs immediately after the button-processing code has finished.
+The software may start to look like this:
 
-The program may have to execute the remaining operations before checking the button again.
+```c
+int main(void)
+{
+    while (1)
+    {
+        read_temperature();
+        read_humidity();
+
+        check_buttons();
+
+        process_uart();
+        process_bluetooth();
+
+        control_fan();
+        control_motor();
+
+        check_faults();
+
+        run_diagnostics();
+
+        save_logs();
+    }
+}
+```
+
+This code is not automatically wrong.
+
+The problem is that every operation is now part of one sequential execution path.
+
+The processor effectively follows:
 
 ```text
-Button event
-     │
-     │
-     ↓
-+----+------------------------------------------------+
-| Button processing already completed                 |
-|                                                    |
-| Motor control          1 ms                        |
-| UART processing        2 ms                        |
-| Display update        20 ms                        |
-+----------------------------------------------------+
-                         │
-                         ↓
-                 Button checked again
+read_temperature()
+        |
+        v
+read_humidity()
+        |
+        v
+check_buttons()
+        |
+        v
+process_uart()
+        |
+        v
+process_bluetooth()
+        |
+        v
+control_fan()
+        |
+        v
+control_motor()
+        |
+        v
+check_faults()
+        |
+        v
+run_diagnostics()
+        |
+        v
+save_logs()
+        |
+        v
+     Repeat
 ```
 
-The system may therefore react much later than expected.
+Each operation must wait until the previous operation finishes.
 
-As software grows, the main loop becomes increasingly difficult to manage.
+This becomes important when different parts of the system have different timing requirements.
 
 ---
 
-# 1.7 Introducing Tasks
+## 1.1.5 A Timing Problem
 
-An RTOS allows the application to divide work into separate **tasks**.
+Consider the following simplified application:
+
+```c
+while (1)
+{
+    read_sensor();
+
+    process_uart();
+
+    process_bluetooth();
+
+    control_motor();
+
+    check_faults();
+}
+```
+
+Suppose:
+
+```text
+read_sensor()       ->   2 ms
+process_uart()      ->   3 ms
+process_bluetooth() -> 100 ms
+control_motor()     ->   1 ms
+check_faults()      ->   1 ms
+```
+
+The execution order is:
+
+```text
+Time ---------------------------------------------------------->
+
+read_sensor
+|---2ms---|
+
+process_uart
+          |----3ms----|
+
+process_bluetooth
+                    |-------------------100ms------------------|
+
+control_motor
+                                                              |-1ms-|
+
+check_faults
+                                                                   |-1ms-|
+```
+
+During those 100 ms of Bluetooth processing, the processor is still executing that code.
+
+The motor-control code is not executing.
+
+The fault-monitoring code is not executing.
+
+That becomes a problem when the motor or fault handling has a strict timing requirement.
 
 For example:
 
 ```text
-                Application
-                     │
-        +------------+------------+
-        │            │            │
-        ↓            ↓            ↓
-   Sensor Task   Motor Task    UART Task
-        │            │            │
-        └------------+------------┘
-                     │
-                     ↓
-                RTOS Scheduler
-                     │
-                     ↓
-                    CPU
+Motor control requirement:
+
+Run every 10 ms
 ```
 
-Each task represents a logical unit of work.
+But another function is occupying the CPU for:
+
+```text
+100 ms
+```
+
+The motor-control operation cannot simply appear in the middle of that function. On a single CPU core, the processor executes one instruction stream at a time.
+
+This is one of the reasons operating-system concepts become useful in larger embedded systems.
+
+---
+
+## 1.1.6 The Basic Idea Behind an RTOS
+
+An RTOS allows the application to divide different responsibilities into manageable units of execution.
+
+Conceptually:
+
+```text
++--------------------------------------+
+|            Application               |
+|                                      |
+|  Sensor       Motor      Communication|
+|  Work         Work       Work        |
++------------------+-------------------+
+                   |
+                   v
+            +-------------+
+            |    RTOS     |
+            |   Kernel    |
+            +------+------+
+                   |
+                   v
+                  CPU
+```
+
+Instead of treating the entire application as one large sequence, the software can be organized into separate activities.
 
 For example:
 
 ```text
-Sensor Task
-    → Read sensors periodically
-
-Motor Task
-    → Execute motor control logic
-
-Communication Task
-    → Process incoming messages
-
-Display Task
-    → Update the display
-
-Logging Task
-    → Store diagnostic information
+Sensor Activity
+      |
+      v
+Motor Control Activity
+      |
+      v
+Communication Activity
+      |
+      v
+Diagnostics Activity
+      |
+      v
+Logging Activity
 ```
 
-The important difference is that the application is no longer responsible for manually executing every operation in one fixed sequence.
+The RTOS provides mechanisms to control how these activities use the processor.
 
-The RTOS scheduler decides which eligible task should run.
+This does **not** mean that all activities physically execute at the exact same instant on a single-core MCU.
+
+Instead, the RTOS provides a controlled way to manage their execution.
 
 ---
 
-# 1.8 Tasks as Independent Units of Work
+## 1.1.7 The RTOS as a Traffic Controller
 
-A useful way to think about a task is as a worker responsible for one particular type of work.
+A useful mental picture is a traffic controller.
 
-Imagine a factory:
-
-```text
-                 Factory
-                    │
-      +-------------+-------------+
-      │             │             │
-      ↓             ↓             ↓
-   Worker A      Worker B      Worker C
-   Sensors        Motor         Display
-```
-
-There may be several workers, but the factory may have limited machines.
-
-Similarly, an MCU may have only one CPU core:
+Imagine several vehicles approaching a narrow road:
 
 ```text
         Task A
-        Task B
-        Task C
-        Task D
-           │
-           ↓
-        One CPU
+          \
+           \
+            \
+             +--------+
+             |        |
+        Task B ------>| CPU |
+             |        |
+            /+--------+
+           /
+          /
+       Task C
 ```
 
-The tasks do not actually execute simultaneously on a single CPU.
+The CPU is a limited resource.
 
-Instead, the RTOS manages the CPU so that the tasks execute according to their scheduling rules.
+Several pieces of software may want to use it.
 
-On a multi-core processor, several tasks can genuinely execute in parallel, but the scheduling principles still apply.
+The RTOS provides rules and mechanisms for managing access to that resource.
+
+A more realistic picture is:
+
+```text
+              +----------------+
+              | Application    |
+              +-------+--------+
+                      |
+       +--------------+--------------+
+       |              |              |
+       v              v              v
+    Sensor          Motor       Communication
+      Work           Work            Work
+       \              |              /
+        \             |             /
+         +------------+------------+
+                      |
+                      v
+               +-------------+
+               |    RTOS     |
+               +------+------+
+                      |
+                      v
+                     CPU
+```
+
+This analogy is useful because it highlights an important point:
+
+> The CPU is a shared resource, and the RTOS provides mechanisms for managing how software uses it.
 
 ---
 
-# 1.9 The Scheduler
+## 1.1.8 What an RTOS Provides
 
-The **scheduler** is the part of the RTOS responsible for selecting which task should use the CPU.
+An RTOS typically provides a collection of services that help the application manage concurrent activities.
 
-A simplified model looks like this:
+At a high level, these services include:
 
 ```text
-                 Tasks
-                   │
-       +-----------+-----------+
-       │           │           │
-       ↓           ↓           ↓
-    READY       BLOCKED     SUSPENDED
-       │
-       ↓
-   Scheduler
-       │
-       ↓
-Selected Task
-       │
-       ↓
-      CPU
++--------------------------------------+
+|                RTOS                  |
+|                                      |
+| Task Management                      |
+| Scheduling                            |
+| Timing                               |
+| Communication                        |
+| Synchronization                      |
+| Interrupt Interaction                |
+| Resource Management                  |
++--------------------------------------+
 ```
 
-A task that is ready to execute competes for CPU time with other ready tasks.
+These services allow the application to structure software around independent responsibilities instead of building everything into one large sequential loop.
 
-The scheduler uses the RTOS scheduling policy to make the decision.
+For example, one part of the application may need to perform work periodically, another may need to wait for incoming communication, while another may need to react quickly to an event.
 
-A common policy is priority-based scheduling.
+The RTOS provides mechanisms for representing and managing these different behaviors.
+
+The detailed implementation of those mechanisms will be covered in later chapters.
+
+---
+
+## 1.1.9 RTOS and Predictability
+
+A major idea behind an RTOS is **predictability**.
+
+In an ordinary application, it may be enough to know that something eventually finishes.
+
+In a real-time embedded system, engineers often need to understand:
+
+```text
+When can this operation start?
+
+How long can it take?
+
+What can delay it?
+
+What happens when another event occurs?
+
+Can it finish before its deadline?
+```
+
+The purpose of an RTOS is not to guarantee that every application will automatically meet every timing requirement.
+
+Instead, it provides the mechanisms needed to **design and analyze** software with timing requirements.
+
+That distinction is important.
+
+An RTOS does not turn poorly designed software into real-time software automatically.
+
+The application still has to be designed correctly.
+
+---
+
+## 1.1.10 RTOS Does Not Mean "Everything Runs at Once"
+
+Suppose an MCU has one CPU core:
+
+```text
+CPU Core
+   |
+   +---- Task A
+   +---- Task B
+   +---- Task C
+   +---- Task D
+```
+
+Only one stream of instructions can execute at a particular instant on that core.
+
+The RTOS manages the switching and execution of these different software activities.
+
+Conceptually:
+
+```text
+Time -------------------------------------------------------->
+
+Task A       |---------|
+                         |
+Task B                 |------|
+                                |
+Task C                       |----|
+                                      |
+Task A                              |---------|
+```
+
+The exact scheduling behavior depends on the RTOS and its configuration.
+
+The important idea is that multiple logical activities can share a processor in a structured way.
+
+On a multi-core processor, several activities may also execute physically in parallel, but the RTOS still has to manage scheduling, timing, resources, and synchronization.
+
+---
+
+## 1.1.11 RTOS in an Embedded Product
+
+Consider a simplified automotive controller.
+
+The hardware may contain:
+
+```text
++------------------------------------------------+
+|                  MCU                           |
+|                                                |
+|  CPU                                            |
+|  RAM                                            |
+|  Flash                                          |
+|  Timer                                          |
+|  UART                                           |
+|  SPI                                            |
+|  I2C                                            |
+|  CAN                                            |
+|  GPIO                                           |
++------------------------------------------------+
+```
+
+The application may have several responsibilities:
+
+```text
+Sensor Processing
+Motor Control
+CAN Communication
+Diagnostics
+Fault Monitoring
+Logging
+```
+
+Without some architectural structure, these responsibilities can become tightly connected.
+
+An RTOS allows these responsibilities to be organized into manageable execution units while providing common mechanisms for timing and coordination.
+
+A simplified conceptual architecture is:
+
+```text
+                Embedded Application
+                         |
+        +----------------+----------------+
+        |                |                |
+        v                v                v
+   Sensor Work      Motor Control     Communication
+        |                |                |
+        +----------------+----------------+
+                         |
+                         v
+                    RTOS Services
+                         |
+                         v
+                      Hardware
+```
+
+This structure becomes increasingly valuable as the software grows.
+
+---
+
+## 1.1.12 The Important Difference Between "OS" and "RTOS"
+
+An RTOS is still an operating system, but real-time systems place particular importance on timing behavior.
+
+A general-purpose operating system may optimize heavily for things such as:
+
+```text
+Throughput
+User experience
+Fairness
+Rich applications
+Large memory systems
+Storage
+Networking
+```
+
+An RTOS is commonly designed with stronger emphasis on:
+
+```text
+Predictable response
+Controlled latency
+Timing requirements
+Deterministic behavior
+Resource constraints
+```
+
+The exact characteristics depend on the RTOS implementation and the system architecture.
+
+The key point is that the design goals are different.
+
+---
+
+## 1.1.13 Why an RTOS Is Different From a Large While Loop
+
+A `while(1)` loop and an RTOS are not opposites.
+
+A `while(1)` loop can still exist inside an RTOS task.
 
 For example:
-
-```text
-Priority 5   → Motor control
-Priority 4   → Communication
-Priority 2   → Display
-Priority 1   → Logging
-```
-
-If all four tasks are ready, a priority-based scheduler may select the highest-priority eligible task.
-
-The exact behavior depends on the RTOS configuration and scheduling model.
-
----
-
-# 1.10 Task States
-
-A task does not remain in the CPU continuously.
-
-A typical RTOS maintains task states such as:
-
-```text
-                  +---------+
-                  |  READY  |
-                  +----+----+
-                       |
-                       | Scheduler selects
-                       ↓
-                  +---------+
-                  | RUNNING |
-                  +----+----+
-                       |
-              +--------+--------+
-              |        |        |
-              ↓        ↓        ↓
-            Delay    Wait     Suspend
-              |        |        |
-              ↓        ↓        ↓
-          +-------+  +-------+  +-----------+
-          |BLOCKED|  |BLOCKED|  | SUSPENDED |
-          +-------+  +-------+  +-----------+
-```
-
-The names and exact implementation can differ between RTOSes, but the general concept is common.
-
-### READY
-
-The task can run but is currently not using the CPU.
-
-### RUNNING
-
-The scheduler has selected the task and it is currently executing.
-
-### BLOCKED
-
-The task is waiting for something.
-
-Examples:
-
-* a delay to expire,
-* a queue message,
-* a semaphore,
-* a notification,
-* an event.
-
-### SUSPENDED
-
-The task has explicitly been removed from normal scheduling until it is resumed.
-
----
-
-# 1.11 Blocking and Why It Matters
-
-Blocking is one of the most important RTOS concepts.
-
-Consider a sensor task:
 
 ```c
 void SensorTask(void *argument)
@@ -649,1539 +708,221 @@ void SensorTask(void *argument)
     {
         read_sensor();
 
-        vTaskDelay(pdMS_TO_TICKS(100));
+        process_sensor();
+
+        wait_for_next_period();
     }
 }
 ```
 
-After executing `read_sensor()`, the task does not need to continuously consume CPU time for the next 100 ms.
+The difference is that the application is no longer forced to put every system responsibility into one single loop.
 
-It can enter a blocked state.
-
-```text
-Sensor Task
-
-RUNNING
-   │
-   │ read_sensor()
-   ↓
-Delay 100 ms
-   │
-   ↓
-BLOCKED
-   │
-   │ 100 ms expires
-   ↓
-READY
-   │
-   ↓
-RUNNING
-```
-
-While the sensor task is blocked, another task can use the CPU.
-
-This is much better than continuously polling:
-
-```c
-while (timer_not_expired())
-{
-    /* keep checking */
-}
-```
-
-Continuous polling can waste CPU cycles.
-
-Blocking allows the RTOS to use the CPU for useful work elsewhere.
-
----
-
-# 1.12 Event-Driven Execution
-
-Many RTOS systems are naturally event-driven.
-
-The basic pattern is:
-
-```text
-Event
-  │
-  ↓
-Wake the appropriate task
-  │
-  ↓
-Task executes
-  │
-  ↓
-Task waits again
-```
-
-For example:
-
-```text
-UART data arrives
-       │
-       ↓
-      ISR
-       │
-       ↓
-Queue / Notification
-       │
-       ↓
-Communication Task
-       │
-       ↓
-Process message
-       │
-       ↓
-Wait for next message
-```
-
-This architecture is extremely common in embedded systems.
-
----
-
-# 1.13 Preemption
-
-One of the major features of a preemptive RTOS is **preemption**.
-
-Preemption allows a currently running task to be interrupted when another task becomes eligible to run according to the scheduling policy.
-
-Consider:
-
-```text
-Low Priority Task
-████████████████████████████████
-             ↑
-             │
-       High Priority Task
-       becomes READY
-```
-
-The scheduler may perform:
-
-```text
-Low Priority Task
-        │
-        │ preempted
-        ↓
-   Scheduler
-        │
-        ↓
-High Priority Task
-        │
-        │ executes
-        ↓
-Low Priority Task resumes
-```
+Instead, different responsibilities can be structured independently.
 
 Conceptually:
 
 ```text
-CPU timeline
-
-|------ Low ------|-- High --|------ Low ------|
-                  ↑
-               Preemption
+             Application
+                  |
+      +-----------+-----------+
+      |           |           |
+      v           v           v
+ Sensor Task  Motor Task  Comm Task
+      |           |           |
+      +-----------+-----------+
+                  |
+                  v
+                RTOS
+                  |
+                  v
+                 CPU
 ```
 
-This allows urgent work to receive CPU time without waiting for a lower-priority task to finish voluntarily.
+This separation is one of the major architectural benefits of an RTOS.
 
 ---
 
-# 1.14 Context Switching
+## 1.1.14 RTOS as a Layer of Abstraction
 
-When the RTOS changes from one task to another, the processor must preserve enough CPU state for the original task to continue correctly later.
+An RTOS also provides a layer of abstraction between application logic and low-level processor behavior.
 
-This operation is called a **context switch**.
+Without such a layer, application developers may need to manually deal with many low-level details.
 
-A simplified view is:
-
-```text
-             Task A running
-                   │
-                   ↓
-            Save Task A context
-                   │
-                   ↓
-               Scheduler
-                   │
-                   ↓
-            Restore Task B context
-                   │
-                   ↓
-             Task B running
-```
-
-The context can include processor state such as:
+With an RTOS, the application can use higher-level concepts such as:
 
 ```text
-Registers
-Program Counter
-Stack Pointer
-Processor status
-```
-
-The exact registers and mechanism depend on the architecture.
-
-On ARM Cortex-M systems, context switching is closely related to mechanisms such as:
-
-```text
-PendSV
-SVC
-SysTick
-PSP
-MSP
-```
-
-These topics will be covered later in depth.
-
----
-
-# 1.15 Context Switching Has a Cost
-
-A context switch is useful, but it is not free.
-
-The processor may need to:
-
-1. save the current task's context,
-2. update scheduler data structures,
-3. select another task,
-4. restore the next task's context,
-5. continue execution.
-
-Therefore excessive task switching can increase CPU overhead.
-
-A good RTOS design balances:
-
-```text
-Responsiveness
-        +
-Task separation
-        +
-CPU overhead
-        +
-RAM usage
-```
-
-More tasks are not automatically better.
-
----
-
-# 1.16 Real-Time Requirements
-
-A real-time system usually has timing requirements.
-
-Suppose a motor control operation must complete within 100 µs.
-
-```text
-Event
-  │
-  ↓
-+------------------------------------+
-|       Maximum allowed time         |
-|              100 µs                |
-+------------------------------------+
-                                    │
-                                    ↓
-                                 Deadline
-```
-
-Possible results:
-
-```text
-80 µs   → within deadline
-95 µs   → within deadline
-100 µs  → deadline met
-120 µs  → deadline missed
-```
-
-The system designer therefore needs to understand not only the normal execution time, but also the **worst-case behavior**.
-
----
-
-# 1.17 Hard, Firm and Soft Real-Time
-
-Real-time systems are commonly discussed in three broad categories.
-
-## Hard Real-Time
-
-Missing a deadline may mean the system is considered to have failed.
-
-Examples can include certain:
-
-* safety-critical control systems,
-* aircraft control functions,
-* protection systems,
-* high-integrity industrial systems.
-
-The essential idea is:
-
-```text
-Deadline missed
-      ↓
-System failure or unacceptable behavior
-```
-
----
-
-## Firm Real-Time
-
-A late result may no longer be useful, but an occasional missed deadline does not necessarily mean total system failure.
-
-A simplified example is a data-processing result that becomes obsolete after a specific point in time.
-
-```text
-Useful result
-│
-├──────────────── Deadline
-│
-└───────────────┐
-                │
-                ↓
-            Result late
-            → Discard
-```
-
----
-
-## Soft Real-Time
-
-Late results reduce performance or quality, but the system can continue functioning.
-
-Examples include some:
-
-* audio systems,
-* video systems,
-* user-interface systems,
-* communication workloads.
-
-For example:
-
-```text
-Expected frame interval → 16 ms
-
-Actual:
-16 ms
-17 ms
-18 ms
-16 ms
-```
-
-A little variation may be acceptable.
-
----
-
-# 1.18 Deadline
-
-A **deadline** is the latest acceptable time for an operation to complete.
-
-Consider:
-
-```text
-Event
-  │
-  ↓
-Start
-  │
-  ├───────────────────────────┤
-  │                           │
-  │        allowed time       │
-  │                           │
-  └───────────────────────────┘
-                              ↓
-                           Deadline
-```
-
-The system designer must know whether the operation can meet that deadline under the required conditions.
-
-This is where scheduling analysis, interrupt latency, execution time, and resource contention become important.
-
----
-
-# 1.19 Latency
-
-Latency describes the delay between an event and a corresponding response.
-
-For example:
-
-```text
-Interrupt generated
-        │
-        │ 5 µs
-        ↓
-ISR starts
-```
-
-The interrupt latency in this simplified example is 5 µs.
-
-Real systems have several different latency measurements:
-
-```text
-Interrupt latency
-Scheduling latency
-Context-switch latency
-Task response latency
-Communication latency
-```
-
-Latency is not the same as execution time.
-
-For example:
-
-```text
-Event
-  │
-  │ 10 µs
-  ↓
-Task starts
-  │
-  │ 20 µs
-  ↓
-Task completes
-```
-
-Here:
-
-```text
-Response latency ≈ 10 µs
-Execution time   ≈ 20 µs
-```
-
-The total response from the event to completion would be approximately:
-
-```text
-30 µs
-```
-
-The exact definitions depend on the measurement being made.
-
----
-
-# 1.20 Jitter
-
-Jitter describes variation in timing.
-
-Suppose a periodic task is intended to execute every 10 ms.
-
-Ideal behavior:
-
-```text
-|----10ms----|----10ms----|----10ms----|----10ms----|
-```
-
-Actual behavior might be:
-
-```text
-|---9---|-----11-----|----10----|------12------|
-```
-
-The interval changes from one execution to another.
-
-That variation is timing jitter.
-
-Jitter can come from many sources:
-
-* interrupts,
-* higher-priority tasks,
-* critical sections,
-* disabled interrupts,
-* resource contention,
-* cache behavior,
-* communication activity,
-* scheduler behavior.
-
-For some applications, small jitter is acceptable.
-
-For other control systems, jitter must be tightly controlled.
-
----
-
-# 1.21 Determinism
-
-A real-time system should have behavior that can be reasoned about within known bounds.
-
-This property is often described as **determinism**.
-
-Suppose a function normally takes:
-
-```text
-10 µs
-```
-
-but in a particular situation it may take:
-
-```text
-500 µs
-```
-
-The average execution time may look good, but the worst case may be unacceptable.
-
-A real-time designer therefore studies:
-
-```text
-Best case
-Typical case
-Worst case
-```
-
-For example:
-
-```text
-Execution time
-
-Best case       = 8 µs
-Typical         = 10 µs
-Worst case      = 15 µs
-```
-
-The worst-case value is especially important when verifying deadline requirements.
-
----
-
-# 1.22 WCET
-
-**WCET** stands for:
-
-> Worst-Case Execution Time
-
-WCET represents the maximum execution time that a piece of software is expected to require under defined conditions.
-
-Consider:
-
-```text
-Function A
-
-Best case   → 8 µs
-Typical     → 10 µs
-Worst case  → 15 µs
-```
-
-If a control task has only 20 µs available, a 15 µs WCET may be acceptable.
-
-But if the same operation has:
-
-```text
-WCET = 40 µs
-```
-
-then the design must be reconsidered.
-
-WCET analysis becomes increasingly important in high-reliability and safety-oriented systems.
-
----
-
-# 1.23 Bare-Metal and RTOS Architecture
-
-The fundamental difference can be visualized as follows.
-
-### Bare-Metal
-
-```text
-+-------------------------+
-|      Application        |
-|                         |
-|  Main Loop              |
-|   ├─ Task A             |
-|   ├─ Task B             |
-|   ├─ Task C             |
-|   └─ Task D             |
-+------------+------------+
-             |
-             ↓
-          Hardware
-```
-
-The application directly controls the execution flow.
-
-### RTOS
-
-```text
-+--------------------------------+
-|          Application           |
-|                                |
-| Task A   Task B   Task C       |
-| Task D   Task E                |
-+---------------+----------------+
-                |
-                ↓
-+--------------------------------+
-|          RTOS Kernel           |
-|                                |
-| Scheduler                      |
-| Task Management                |
-| Queue                          |
-| Semaphore                      |
-| Mutex                          |
-| Timer                          |
-| Event Management               |
-+---------------+----------------+
-                |
-                ↓
-+--------------------------------+
-|            Hardware            |
-| CPU / RAM / Timer / UART / SPI |
-+--------------------------------+
-```
-
-The RTOS introduces a kernel layer that manages common operating-system services.
-
----
-
-# 1.24 RTOS Kernel Responsibilities
-
-The kernel typically provides several fundamental services.
-
-```text
-                 RTOS Kernel
-                      │
-       +--------------+--------------+
-       │              │              │
-       ↓              ↓              ↓
-  Scheduling     Synchronization  Communication
-       │              │              │
-       ↓              ↓              ↓
-     Tasks        Mutex/Semaphore    Queue
-       │
-       ↓
-     Timing
-       │
-       ↓
-    Delay/Timer
-```
-
-Depending on the RTOS, other services may include:
-
-* memory management,
-* event handling,
-* software timers,
-* message passing,
-* thread-local storage,
-* memory protection,
-* networking,
-* power management,
-* device management.
-
-Different RTOS implementations provide different feature sets.
-
----
-
-# 1.25 Communication Between Tasks
-
-Multiple tasks often need to exchange information.
-
-For example:
-
-```text
-Sensor Task
-     │
-     │ temperature data
-     ↓
-+-----------+
-|   Queue   |
-+-----------+
-     │
-     ↓
-Control Task
-```
-
-The queue acts as a communication mechanism.
-
-Similarly, a task may wait for an event:
-
-```text
-Communication Task
-        │
-        ↓
-   Wait for data
-        │
-        ↓
-     BLOCKED
-        │
-        │ data arrives
-        ↓
-      READY
-        │
-        ↓
-     RUNNING
-```
-
-Common RTOS communication and synchronization mechanisms include:
-
-* queues,
-* semaphores,
-* mutexes,
-* task notifications,
-* event groups,
-* message buffers,
-* stream buffers.
-
-Each mechanism solves a somewhat different problem.
-
----
-
-# 1.26 Synchronization
-
-Concurrency creates another important problem: multiple execution contexts may access the same resource.
-
-Consider:
-
-```c
-int counter = 0;
-```
-
-Two tasks execute:
-
-```c
-counter++;
-```
-
-A simple increment can conceptually involve:
-
-```text
-READ
-  ↓
-MODIFY
-  ↓
-WRITE
-```
-
-The following sequence is possible:
-
-```text
-Task A                  Task B
-------                  ------
-
-READ counter = 0
-                        READ counter = 0
-
-increment
-                        increment
-
-WRITE 1
-                        WRITE 1
-```
-
-The final value becomes:
-
-```text
-counter = 1
-```
-
-instead of:
-
-```text
-counter = 2
-```
-
-This type of bug is called a **race condition**.
-
-RTOS systems therefore require proper synchronization.
-
-Common mechanisms include:
-
-```text
-Mutex
-Semaphore
-Critical Section
-Atomic Operation
-Spinlock
-```
-
-The correct choice depends on the problem being solved.
-
----
-
-# 1.27 Interrupts and RTOS
-
-Embedded systems are event-driven at the hardware level.
-
-A peripheral may generate an interrupt when:
-
-* UART data arrives,
-* a timer expires,
-* SPI transfer completes,
-* a GPIO changes state,
-* a DMA transfer finishes,
-* an ADC conversion completes.
-
-A common architecture is:
-
-```text
-Peripheral
-    │
-    ↓
-Interrupt
-    │
-    ↓
-   ISR
-    │
-    ↓
-Queue / Notification / Event
-    │
-    ↓
 Task
-```
-
-The ISR should generally perform only the urgent work required at interrupt level.
-
-Longer processing can often be deferred to a task.
-
-For example:
-
-```text
-UART Interrupt
-      │
-      ↓
-Receive byte
-      │
-      ↓
-Place data into buffer
-      │
-      ↓
-Notify task
-      │
-      ↓
-UART Processing Task
-      │
-      ↓
-Process complete message
-```
-
-This design helps keep interrupt execution short and allows the RTOS scheduler to manage the larger amount of processing.
-
----
-
-# 1.28 RTOS Does Not Eliminate Software Complexity
-
-Introducing an RTOS does not automatically solve system-design problems.
-
-It introduces its own set of concerns:
-
-```text
-Task scheduling
-Race conditions
-Priority inversion
-Deadlock
-Starvation
-Stack overflow
-Memory fragmentation
-Interrupt latency
-Context-switch overhead
-Resource contention
-```
-
-Therefore an RTOS should be viewed as an **engineering framework**, not a magic solution.
-
-A poorly designed RTOS application can be harder to debug than a well-designed bare-metal application.
-
----
-
-# 1.29 Task Granularity
-
-One of the important architectural decisions is deciding how much functionality belongs inside one task.
-
-A system can be designed with:
-
-```text
-Few large tasks
-```
-
-or:
-
-```text
-Many small tasks
-```
-
-Both approaches have advantages and disadvantages.
-
-### Few large tasks
-
-```text
-+ Simpler scheduling
-+ Lower task overhead
-+ Less RAM usage
-
-- More responsibility per task
-- More blocking interactions
-- Larger task logic
-```
-
-### Many small tasks
-
-```text
-+ Clear separation of responsibilities
-+ Independent scheduling
-+ Easier isolation of some workloads
-
-- More RAM
-- More context switches
-- More synchronization
-- More scheduling complexity
-```
-
-A good architecture chooses task boundaries based on system behavior rather than simply creating one task for every function.
-
----
-
-# 1.30 Priority
-
-Tasks are often assigned priorities.
-
-For example:
-
-```text
-Priority 5 → Motor control
-Priority 4 → Safety monitoring
-Priority 3 → Communication
-Priority 2 → Display
-Priority 1 → Logging
-```
-
-A high-priority task generally gets preference over lower-priority tasks when the scheduler must choose between ready tasks.
-
-However, assigning priorities is an architectural decision.
-
-A high priority does not automatically mean:
-
-```text
-"More important because this task is important."
-```
-
-Priority should be connected to timing and scheduling requirements.
-
-For example:
-
-```text
-Deadline-sensitive task
-        ↓
-Needs bounded response
-        ↓
-Higher scheduling priority may be appropriate
-```
-
-Poor priority assignment can lead to:
-
-* starvation,
-* priority inversion,
-* unacceptable response time,
-* missed deadlines.
-
-These topics deserve separate treatment and will be covered later.
-
----
-
-# 1.31 Example: Automotive ECU
-
-Consider a simplified automotive ECU.
-
-The hardware may include:
-
-```text
-CAN
-UART
-SPI
-I2C
-ADC
-Timers
-GPIO
-DMA
-```
-
-The software may contain:
-
-```text
-CAN Reception Task
-Sensor Task
-Control Task
-Diagnostic Task
-Logging Task
-Communication Task
-```
-
-A simplified architecture can look like:
-
-```text
-                 CAN Hardware
-                      │
-                      ↓
-                   CAN ISR
-                      │
-                      ↓
-                  CAN Queue
-                      │
-                      ↓
-                CAN Task
-                      │
-                      ↓
-              Control Decision
-                      │
-                      ↓
-               Control Task
-                      │
-                      ↓
-                  Actuator
-```
-
-At the same time:
-
-```text
-Sensor Task ───────→ Control Task
-
-Diagnostic Task ───→ Diagnostic Manager
-
-Logging Task ──────→ Storage
-
-Communication Task → External Interface
-```
-
-The RTOS provides the mechanisms that allow these activities to coexist in a controlled way.
-
----
-
-# 1.32 Example: Sensor Acquisition System
-
-Consider a sensor that produces data every 10 ms.
-
-The desired flow is:
-
-```text
-Sensor
-  │
-  ↓
-Timer / Interrupt
-  │
-  ↓
-Acquire Data
-  │
-  ↓
-Process Data
-  │
-  ↓
-Store / Transmit
-```
-
-A possible RTOS implementation is:
-
-```text
-+----------------------+
-| Sensor Task          |
-|                      |
-| Read ADC             |
-| Filter data          |
-| Validate data        |
-+----------+-----------+
-           |
-           ↓
-       Queue
-           |
-           ↓
-+----------------------+
-| Processing Task      |
-|                      |
-| Analyze data         |
-| Generate result      |
-+----------+-----------+
-           |
-           ↓
-      Communication
-```
-
-The important design question is not simply whether the code works.
-
-The engineer must also determine:
-
-```text
-Period
-Deadline
-Worst-case execution time
-Task priority
-Communication latency
-Interrupt latency
-Queue capacity
-CPU utilization
-```
-
-That is where real-time engineering begins.
-
----
-
-# 1.33 RTOS and CPU Utilization
-
-The CPU has a limited amount of processing capacity.
-
-Suppose tasks require:
-
-```text
-Task A → 20% CPU
-Task B → 15% CPU
-Task C → 10% CPU
-Task D → 5% CPU
-```
-
-Then approximately:
-
-```text
-Total = 50%
-```
-
-The remaining capacity may be used for:
-
-* lower-priority work,
-* background processing,
-* idle time,
-* power management,
-* future feature growth.
-
-As CPU utilization increases, scheduling becomes more difficult.
-
-A system running permanently close to 100% CPU utilization leaves very little room for:
-
-* unexpected workload,
-* interrupts,
-* timing variation,
-* software growth,
-* diagnostic activities.
-
-Therefore CPU utilization is an important part of RTOS design.
-
----
-
-# 1.34 RTOS and Memory
-
-An RTOS also consumes memory.
-
-A task usually requires a stack.
-
-For example:
-
-```text
-Task A → 1 KB stack
-Task B → 2 KB stack
-Task C → 1 KB stack
-Task D → 4 KB stack
-```
-
-Then the application may additionally require:
-
-```text
-Task Control Blocks
-Queues
-Semaphores
-Timers
-Buffers
-Kernel objects
-Application data
-```
-
-A conceptual memory layout might be:
-
-```text
-+-------------------------+
-| Application Data        |
-+-------------------------+
-| Heap / Memory Pools     |
-+-------------------------+
-| Queue Buffers           |
-+-------------------------+
-| Task D Stack            |
-+-------------------------+
-| Task C Stack            |
-+-------------------------+
-| Task B Stack            |
-+-------------------------+
-| Task A Stack            |
-+-------------------------+
-| Kernel Data             |
-+-------------------------+
-```
-
-On small MCUs, memory planning is often as important as CPU scheduling.
-
----
-
-# 1.35 Why RTOS Knowledge Requires More Than API Knowledge
-
-It is possible to write RTOS applications by memorizing APIs:
-
-```c
-xTaskCreate(...);
-xQueueSend(...);
-xSemaphoreTake(...);
-vTaskDelay(...);
-```
-
-But API knowledge alone is not enough for advanced embedded development.
-
-A strong RTOS engineer should understand what happens underneath:
-
-```text
-API
- ↓
-Kernel
- ↓
-Scheduler
- ↓
-Task state
- ↓
-Context switch
- ↓
-CPU registers
- ↓
-Interrupt / exception mechanism
- ↓
-Hardware
-```
-
-For example, knowing how to call `vTaskDelay()` is useful.
-
-Understanding what happens to the task after that call is more valuable.
-
-Conceptually:
-
-```text
-vTaskDelay()
-     │
-     ↓
-Task leaves RUNNING state
-     │
-     ↓
-Task becomes BLOCKED
-     │
-     ↓
-Scheduler selects another READY task
-     │
-     ↓
-CPU executes another task
-```
-
-That deeper mental model is what this book will focus on.
-
----
-
-# 1.36 The Complete RTOS Mental Model
-
-A useful high-level model is:
-
-```text
-                         HARDWARE
-                            │
-                            │ interrupt / event
-                            ↓
-                      +-----------+
-                      |    ISR    |
-                      +-----+-----+
-                            │
-                            │ notify / queue
-                            ↓
-                      +-----------+
-                      |   TASK    |
-                      +-----+-----+
-                            │
-                            │ execute
-                            ↓
-                      +-----------+
-                      | Scheduler|
-                      +-----+-----+
-                            │
-                            ↓
-                           CPU
-```
-
-And from the task perspective:
-
-```text
-             +----------------+
-             |     READY      |
-             +-------+--------+
-                     |
-                     ↓
-             +----------------+
-             |    RUNNING     |
-             +-------+--------+
-                     |
-          +----------+----------+
-          |          |          |
-          ↓          ↓          ↓
-       Delay       Queue      Event
-          |          |          |
-          +----------+----------+
-                     │
-                     ↓
-                 BLOCKED
-                     │
-                     │ event occurs
-                     ↓
-                   READY
-```
-
-This simple model explains a surprisingly large portion of RTOS behavior.
-
----
-
-# 1.37 Important Design Principles
-
-Several principles should remain in mind throughout RTOS development.
-
-### Keep time requirements explicit
-
-Every important real-time operation should have clearly understood timing expectations.
-
-### Keep tasks focused
-
-A task should have a clear responsibility rather than becoming a second "main loop" containing unrelated functionality.
-
-### Prefer blocking over unnecessary polling
-
-When a task has nothing to do, allow it to block instead of wasting CPU time repeatedly checking a condition.
-
-### Keep interrupt handlers short
-
-Interrupt handlers should generally perform urgent interrupt-level work and defer larger processing to tasks where appropriate.
-
-### Protect shared resources
-
-Whenever multiple execution contexts can access the same resource, concurrency must be considered.
-
-### Design for the worst case
-
-Average execution time is not enough for important real-time paths.
-
-### Treat RAM as a design resource
-
-Every task, queue, buffer, and synchronization object consumes memory.
-
----
-
-# 1.38 Common Mistakes in Beginner RTOS Designs
-
-### Creating a task for every function
-
-Not every function deserves its own task.
-
-Functions are software units.
-
-Tasks are scheduling units.
-
-These are different concepts.
-
----
-
-### Using delays as synchronization
-
-Code such as:
-
-```c
-vTaskDelay(pdMS_TO_TICKS(100));
-check_status();
-```
-
-does not guarantee that the required event happened during those 100 ms.
-
-Synchronization should be based on actual events when possible.
-
-For example:
-
-```text
+Timer
 Queue
 Semaphore
-Notification
+Mutex
 Event
+Notification
 ```
 
-is generally a better model.
+For example, instead of manually writing all of the logic required to wait for an event and decide when another piece of software should execute, an application can use an RTOS synchronization mechanism.
+
+The application therefore works with higher-level concepts while the kernel handles the underlying mechanisms.
+
+The internal implementation is still important and will be studied later, but the abstraction makes complex systems easier to structure.
 
 ---
 
-### Giving everything high priority
+## 1.1.15 A Complete Simple Picture
 
-If every task is high priority, priority loses its meaning.
-
-A priority hierarchy is useful only when priorities represent meaningful scheduling requirements.
-
----
-
-### Doing too much work inside an ISR
-
-Large amounts of processing inside an ISR can increase:
+The basic idea of an RTOS can be summarized with the following architecture:
 
 ```text
-Interrupt latency
-Scheduling latency
-Jitter
+                     EMBEDDED PRODUCT
+                            |
+                            v
+             +---------------------------+
+             |       APPLICATION         |
+             |                           |
+             | Sensor    Motor    Comm   |
+             | Control   Control  Logic  |
+             +-------------+-------------+
+                           |
+                           v
+             +---------------------------+
+             |           RTOS            |
+             |                           |
+             | Timing                    |
+             | Task Management           |
+             | Scheduling                |
+             | Communication             |
+             | Synchronization           |
+             +-------------+-------------+
+                           |
+                           v
+             +---------------------------+
+             |          HARDWARE         |
+             |                           |
+             | CPU | RAM | Timers        |
+             | UART | SPI | I2C | CAN    |
+             +---------------------------+
 ```
 
-and can prevent other interrupts from being handled promptly.
+The application describes **what the product needs to do**.
+
+The RTOS provides mechanisms for organizing **when and how software activities execute and interact**.
+
+The hardware provides the actual processing and peripheral resources.
 
 ---
 
-### Ignoring stack usage
+## 1.1.16 A Simple Mental Model
 
-A task can work correctly for weeks and then fail when an unusual execution path requires more stack.
-
-Stack monitoring and measurement are therefore important.
-
----
-
-# 1.39 RTOS as an Engineering Model
-
-The most useful way to think about an RTOS is not as a collection of APIs.
-
-Think of it as a model for organizing concurrent work.
-
-The application can be understood as:
+The simplest mental model to remember is:
 
 ```text
-                Events
-                  │
-                  ↓
-              Tasks wake
-                  │
-                  ↓
-              Scheduler
-                  │
-                  ↓
-              CPU executes
-                  │
-                  ↓
-           Task completes work
-                  │
-                  ↓
-              Task waits
-                  │
-                  ↓
-          Next event arrives
-                  │
-                  └───────────────→ Repeat
+          Application has many jobs
+                    |
+                    v
+        +-----------------------+
+        | Sensor                |
+        | Motor                 |
+        | Communication         |
+        | Diagnostics           |
+        | Logging               |
+        +-----------+-----------+
+                    |
+                    v
+                  RTOS
+                    |
+                    v
+          Manages software use
+              of CPU/resources
+                    |
+                    v
+                 Hardware
 ```
 
-Once this model becomes clear, APIs become much easier to understand.
+The RTOS does not create extra CPU power.
+
+It does not make every operation instantly complete.
+
+It does not automatically guarantee deadlines.
+
+Instead, it gives the software a structured way to manage multiple activities and their timing requirements.
 
 ---
 
-# 1.40 Chapter Summary
+## 1.1.17 Core Idea
 
-An RTOS provides a structured way to manage multiple activities in a resource-constrained embedded system.
+The central idea behind an RTOS can be expressed in one sentence:
 
-Its purpose is not simply to increase execution speed.
+> **An RTOS provides a structured and predictable way to manage multiple software activities on an embedded processor where timing matters.**
 
-The important concepts introduced in this chapter are:
-
-```text
-Real-Time
-    ↓
-Timing is part of correctness
-
-Task
-    ↓
-Unit of schedulable work
-
-Scheduler
-    ↓
-Chooses which eligible task runs
-
-READY
-    ↓
-Task can run
-
-RUNNING
-    ↓
-Task currently owns the CPU
-
-BLOCKED
-    ↓
-Task is waiting for time or an event
-
-Preemption
-    ↓
-A task can be interrupted by another eligible task
-
-Context Switch
-    ↓
-CPU state changes from one task to another
-
-Deadline
-    ↓
-Latest acceptable completion time
-
-Latency
-    ↓
-Delay between an event and response
-
-Jitter
-    ↓
-Variation in timing
-
-Determinism
-    ↓
-Predictable behavior within known limits
-
-WCET
-    ↓
-Worst-case execution time
-
-Synchronization
-    ↓
-Controls access to shared resources
-
-Communication
-    ↓
-Allows tasks to exchange information
-```
-
-The most important mental model to carry forward is:
+Another useful way to remember it is:
 
 ```text
-                  EVENT
-                    │
-                    ↓
-                   ISR
-                    │
-                    ↓
-             Queue / Notification
-                    │
-                    ↓
-              Task becomes READY
-                    │
-                    ↓
-                Scheduler
-                    │
-                    ↓
-                   CPU
-                    │
-                    ↓
-               Task executes
-                    │
-                    ↓
-             Task blocks/waits
-                    │
-                    └──────────→ Next event
+Without RTOS
+    |
+    v
+Large sequential application
+    |
+    v
+Application manually controls execution flow
+
+
+With RTOS
+    |
+    v
+Application divided into manageable activities
+    |
+    v
+RTOS provides execution and timing mechanisms
+    |
+    v
+Hardware executes the selected work
 ```
 
-This model will become the foundation for everything that follows.
+The RTOS therefore becomes an important architectural layer between the application and the processor.
 
 ---
 
-# Chapter 2 — RTOS Kernel Fundamentals
+## 1.1.18 Summary
 
-The next chapter moves below the application level and starts looking at what the RTOS kernel actually manages.
+An RTOS is an operating system designed for systems where **timing and predictability are important parts of correct behavior**.
 
-Topics will include:
+A simple embedded application can often work perfectly well with a single `while(1)` loop. As the number of responsibilities grows, however, a purely sequential design can make timing, communication, and software organization increasingly difficult.
 
-* Kernel architecture
-* Kernel data structures
-* Task Control Block
-* Task stacks
-* Ready lists
-* Blocked lists
-* Scheduler data structures
-* System tick
-* Kernel tick handling
-* Context-switch path
-* Critical sections
-* Interrupt interaction
-* Kernel startup
-* Scheduler startup
-* Idle task
-* Tickless operation
-* Kernel objects
+An RTOS provides a structured environment in which these activities can be organized and managed.
 
-The objective is to move from simply **using an RTOS** to understanding **how the RTOS works internally**.
+The fundamental idea is:
+
+```text
+Multiple Application Responsibilities
+                |
+                v
+          RTOS Services
+                |
+                v
+        Controlled Execution
+                |
+                v
+               CPU
+```
+
+The most important distinction to remember is:
+
+```text
+RTOS ≠ "Fast Operating System"
+
+RTOS = Operating System designed around
+       predictable and controlled timing behavior
+```
+
+At this stage, the most important concepts are only the foundation:
+
+* An RTOS is an operating system for real-time embedded systems.
+* Real-time behavior means timing is part of system correctness.
+* A small application may not need an RTOS.
+* A larger application can benefit from structured execution management.
+* An RTOS does not create additional CPU power.
+* An RTOS provides mechanisms for managing multiple software activities and their timing requirements.
+* Predictability is more important than simply achieving a fast average execution time.
+
+These ideas form the foundation for understanding the remaining RTOS architecture.
+
