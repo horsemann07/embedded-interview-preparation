@@ -463,22 +463,67 @@ static inline uint32_t keepRightmostN(uint32_t value, uint8_t n)
 Question 11
 Reverse bits in uint32_t
 ====================================================
-
-Counter Answer:
-1) Bit-by-bit is smallest code, table can be faster.
-2) Embedded tradeoff: Flash/RAM budget vs speed.
-3) On ARM cores with RBIT support, compiler intrinsic is often fastest.
-*/
-
-static inline uint32_t reverseBits32(uint32_t x)
+ *
+ * APPROACH:
+ * 1. Start with result = 0.
+ * 2. Extract the rightmost bit of n using (n & 1U).
+ * 3. Shift result left by one bit.
+ * 4. Add the extracted bit to result using OR (|).
+ * 5. Shift n right by one bit to process the next bit.
+ * 6. Repeat 32 times.
+ *
+ * WHY?
+ * We extract bits from right to left and add them to result
+ * from left to right. This reverses the bit order.
+ *
+ * 4-BIT WALKTHROUGH:
+ *
+ * Input: 1010
+ * Initial result = 0000
+ *
+ * Iteration 1:
+ * Extracted bit = 0
+ * Result        = 0000
+ *
+ * Iteration 2:
+ * Extracted bit = 1
+ * Result        = 0001
+ *
+ * Iteration 3:
+ * Extracted bit = 0
+ * Result        = 0010
+ *
+ * Iteration 4:
+ * Extracted bit = 1
+ * Result        = 0101
+ *
+ * Final reversed result = 0101
+ *
+ * Note: The actual function reverses all 32 bits,
+ * including leading zeros in the input representation.
+ */
+uint32_t reverseBits(uint32_t n)
 {
-    x = ((x & 0x55555555U) << 1) | ((x >> 1) & 0x55555555U);
-    x = ((x & 0x33333333U) << 2) | ((x >> 2) & 0x33333333U);
-    x = ((x & 0x0F0F0F0FU) << 4) | ((x >> 4) & 0x0F0F0F0FU);
-    x = ((x & 0x00FF00FFU) << 8) | ((x >> 8) & 0x00FF00FFU);
-    x = (x << 16) | (x >> 16);
-    return x;
+    uint32_t result = 0U;
+
+    for (int i = 0; i < 32; i++)
+    {
+        // Step 1: Get the rightmost bit of n.
+        uint32_t bit = n & 1U;
+
+        // Step 2: Shift result left to make room.
+        result <<= 1;
+
+        // Step 3: Add the extracted bit to result.
+        result |= bit;
+
+        // Step 4: Move to the next bit of n.
+        n >>= 1;
+    }
+
+    return result;
 }
+
 ```
 
 12. Set bits at positions specified by a mask.
